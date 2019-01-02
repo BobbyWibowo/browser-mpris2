@@ -19,5 +19,11 @@
 
   "permissions": [
     "nativeMessaging"
-  ]
+  ],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "browser-mpris-R79hzLApXL@BobbyWibowo.addons.mozilla.org"
+    }
+  }
 }
