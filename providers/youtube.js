@@ -318,12 +318,13 @@ function quit () {
 }
 
 function waitPage () {
-  if (waitPageTimeout !== undefined) clearTimeout(waitPageTimeout)
+  if (waitPageTimeout) clearTimeout(waitPageTimeout)
   const title = $('h1.title yt-formatted-string').text()
   const artist = $('yt-formatted-string#owner-name').text()
   videoElement = $('video').get(0)
-  if (title && artist && videoElement.duration) return enterVideo(title, artist)
-  waitPageTimeout = setTimeout(() => waitPage(), 100)
+  if (title && artist && videoElement && videoElement.duration)
+    return enterVideo(title, artist)
+  waitPageTimeout = setTimeout(() => waitPage(), 1000)
 }
 
 window.addEventListener('DOMContentLoaded', e => {
@@ -344,7 +345,7 @@ window.addEventListener('yt-page-data-updated', e => {
 
   const nextUrl = new URL(location)
 
-  if (!isVideo() && isVideo(prevUrl)) {
+  if (videoElement) {
     videoElement = null
     quit()
   }
@@ -354,6 +355,8 @@ window.addEventListener('yt-page-data-updated', e => {
 
   if (isVideo())
     waitPage()
+  else if (waitPageTimeout)
+    clearTimeout(waitPageTimeout)
 
   prevUrl = nextUrl
 })
