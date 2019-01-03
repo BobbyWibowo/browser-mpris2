@@ -50,8 +50,10 @@ function loopStatus () {
   return 'None'
 }
 
-function enterVideo (title, artist) {
+function enterVideo (title, artist, element) {
   const id = (new URL(location)).searchParams.get('v')
+
+  videoElement = element
 
   video = {
     Metadata: {
@@ -319,11 +321,14 @@ function quit () {
 
 function waitPage () {
   if (waitPageTimeout) clearTimeout(waitPageTimeout)
+
   const title = $('h1.title yt-formatted-string').text()
   const artist = $('yt-formatted-string#owner-name').text()
-  videoElement = $('video').get(0)
-  if (title && artist && videoElement && videoElement.duration)
-    return enterVideo(title, artist)
+  const element = $('video').get(0)
+
+  if (title && artist && element && element.duration)
+    return enterVideo(title, artist, element)
+
   waitPageTimeout = setTimeout(() => waitPage(), 1000)
 }
 
@@ -345,18 +350,17 @@ window.addEventListener('yt-page-data-updated', e => {
 
   const nextUrl = new URL(location)
 
-  if (videoElement) {
-    videoElement = null
-    quit()
-  }
-
   if (!isVideo() || (isVideo(prevUrl) && playlist.id !== nextUrl.searchParams.get('list')))
     playlist = new Playlist()
 
-  if (isVideo())
+  if (isVideo()) {
     waitPage()
-  else if (waitPageTimeout)
-    clearTimeout(waitPageTimeout)
+  } else {
+    if (waitPageTimeout)
+      clearTimeout(waitPageTimeout)
+    if (videoElement && (videoElement.paused || videoElement.ended))
+      quit()
+  }
 
   prevUrl = nextUrl
 })

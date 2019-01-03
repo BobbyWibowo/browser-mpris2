@@ -3,7 +3,7 @@
 
   "name": "browser-mpris2",
   "description": "Implements the MPRIS2 interface for Chrome and Firefox",
-  "version": "0.1.1",
+  "version": "0.1.2",
 
   "background": {
     "scripts": ["background.js"],
