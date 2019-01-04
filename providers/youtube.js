@@ -53,6 +53,8 @@ function loopStatus () {
 function enterVideo (title, artist, element) {
   const id = (new URL(location)).searchParams.get('v')
 
+  observers.forEach(obs => obs.disconnect())
+  observers = []
   videoElement = element
 
   video = {
@@ -322,12 +324,12 @@ function quit () {
 function waitPage () {
   if (waitPageTimeout) clearTimeout(waitPageTimeout)
 
-  const title = $('h1.title yt-formatted-string').text()
-  const artist = $('yt-formatted-string#owner-name').text()
+  const title = $('h1.title yt-formatted-string').get(0)
+  const artist = $('yt-formatted-string#owner-name').get(0)
   const element = $('video').get(0)
 
-  if (title && artist && element && element.duration)
-    return enterVideo(title, artist, element)
+  if (title && title.innerText && artist && artist.innerText && element && element.duration)
+    return enterVideo(title.innerText, artist.innerText, element)
 
   waitPageTimeout = setTimeout(() => waitPage(), 1000)
 }
@@ -345,9 +347,6 @@ window.addEventListener('DOMContentLoaded', e => {
 // There's also "yt-navigate-start" which fires too early or not at all for
 // cached pages; and "yt-navigate-finish" which also fires early.
 window.addEventListener('yt-page-data-updated', e => {
-  observers.forEach(obs => obs.disconnect())
-  observers = []
-
   const nextUrl = new URL(location)
 
   if (!isVideo() || (isVideo(prevUrl) && playlist.id !== nextUrl.searchParams.get('list')))
@@ -358,7 +357,7 @@ window.addEventListener('yt-page-data-updated', e => {
   } else {
     if (waitPageTimeout)
       clearTimeout(waitPageTimeout)
-    if (videoElement && (videoElement.paused || videoElement.ended))
+    if (videoElement)
       quit()
   }
 
