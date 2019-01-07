@@ -335,6 +335,7 @@ function waitPage () {
 }
 
 window.addEventListener('DOMContentLoaded', e => {
+  if (chrome.extension.inIncognitoContext) return
   prevUrl = new URL(location)
 })
 
@@ -347,6 +348,7 @@ window.addEventListener('DOMContentLoaded', e => {
 // There's also "yt-navigate-start" which fires too early or not at all for
 // cached pages; and "yt-navigate-finish" which also fires early.
 window.addEventListener('yt-page-data-updated', e => {
+  if (chrome.extension.inIncognitoContext) return
   const nextUrl = new URL(location)
 
   if (!isVideo() || (isVideo(prevUrl) && playlist.id !== nextUrl.searchParams.get('list')))
